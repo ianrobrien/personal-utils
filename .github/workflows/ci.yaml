@@ -6,22 +6,15 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - '.github/badges'
-
 permissions:
   contents: write
-
-env:
-  IMAGE_NAME: fakebank
 
 jobs:
   changes:
     name: "Checking folders for changes"
     runs-on: ubuntu-latest
     outputs:
-      terraform: ${{ steps.changes.outputs.terraform }}
-      fakebank: ${{ steps.changes.outputs.fakebank }}
+      src: ${{ steps.changes.outputs.src }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -29,10 +22,8 @@ jobs:
         id: changes
         with:
           filters: |
-            terraform:
-              - 'infrastructure/terraform/**'
-            fakebank:
-              - 'fakebank-impl/**'
+            src:
+              - 'src/**'
 
   vale:
     runs-on: ubuntu-latest
@@ -46,29 +37,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-  #  lint:
-  #    runs-on: ubuntu-latest
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #        with:
-  #          # Full git history is needed to get a proper list of changed files
-  #          # within `super-linter`
-  #          fetch-depth: 0
-  #      - uses: github/super-linter@v5
-  #        env:
-  #          DEFAULT_BRANCH: main
-  #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #          IGNORE_GENERATED_FILES: true
-  #          SUPPRESS_POSSUM: true
-  #          VALIDATE_HTML: false
-  #          VALIDATE_JAVA: false
-  #          VALIDATE_JSCPD: false
-  #          VALIDATE_NATURAL_LANGUAGE: false
-  #          VALIDATE_SQLFLUFF: false
-
   build:
     needs: [ vale, changes ]
-    if: ${{ needs.changes.outputs.fakebank == 'true' }}
+    if: ${{ needs.changes.outputs.src == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,7 +48,6 @@ jobs:
           distribution: 'temurin'
           java-version: '20'
           cache: 'maven'
-
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
@@ -85,66 +55,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-
-      - name: Maven Dependency Tree Dependency Submission
-        uses: advanced-security/maven-dependency-submission-action@v3.0.2
-
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-        # mvn -B -Dspring.profiles.active=dev package --file pom.xml
-
-      # - name: Generate JaCoCo Badge
-      #   uses: cicirello/jacoco-badge-generator@v2
-      #   with:
-      #     generate-branches-badge: true
-      #     jacoco-csv-file: fakebank-impl/target/site/jacoco/jacoco.csv
-      #     coverage-label: Coverage
-
-      # - name: Commit and push the coverage badge
-      #   if: github.ref != 'refs/heads/main'
-      #   uses: EndBug/add-and-commit@v9
-      #   with:
-      #     default_author: github_actions
-      #     message: 'Commit coverage badge'
-      #     add: '*.svg'
-      #     new_branch: ${{GITHUB_REF_NAME}}-coverage-badge
-
-      - name: Upload JaCoCo coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-report
-          path: icm-impl/target/site/jacoco/
-
-  push-store-image:
-    needs: [ vale, build, changes ]
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    if: ${{ github.ref == 'refs/heads/main' &&  needs.changes.outputs.fakebank == 'true' }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: 'Build fakebank image'
-        run: |
-          docker build --file docker-compose/Dockerfile.fakebank . --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
-
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-
-      - name: Push image
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: Maven Dependency Tree Dependency Submission
+        uses: advanced-security/maven-dependency-submission-action@v3.0.2

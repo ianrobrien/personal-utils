@@ -13,11 +13,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "/docker-compose"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/infrastructure/terraform"
-    schedule:
-      interval: "daily"
