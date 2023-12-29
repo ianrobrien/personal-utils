@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# resize.sh - Resize an image based on the specified gaming system.
+# rg35xx_resize.sh - Resize an image based on the specified gaming system.
 
 # Usage:
-#   ./resize.sh --system=<system> <source_image>
+#   ./rg35xx_resize.sh --system=<system> <source_image>
 #
 # Arguments:
 #   --system=<system> - Specify the gaming system for which the image should be resized.
@@ -11,9 +11,9 @@
 #   <source_image>    - The source image file that you want to resize.
 #
 # Examples:
-#   ./resize.sh --system=ARCADE image.png
-#   ./resize.sh --system=FC input.jpg
-#   ./resize.sh --system=SFC photo.png
+#   ./rg35xx_resize.sh --system=ARCADE image.png
+#   ./rg35xx_resize.sh --system=FC input.jpg
+#   ./rg35xx_resize.sh --system=SFC photo.png
 #
 # The script will resize the <source_image> to the specified dimensions of the chosen gaming system.
 # The resized image will be saved with the "_resized.png" suffix in the same directory as the source image.
@@ -33,12 +33,12 @@ main() {
   # Parse command line arguments
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
-      --system=*)
-        system="${1#*=}"
-        ;;
-      *)
-        source_image="$1"
-        ;;
+    --system=*)
+      system="${1#*=}"
+      ;;
+    *)
+      source_image="$1"
+      ;;
     esac
     shift
   done
@@ -50,43 +50,43 @@ main() {
   fi
 
   case "$system" in
-    ARCADE)
-      dimensions="340x465"
-      ;;
-    FC)
-      dimensions="340x465"
-      ;;
-    GB)
-      dimensions="340x340"
-      ;;
-    GBA)
-      dimensions="340x340"
-      ;;
-    GBC)
-      dimensions="340x340"
-      ;;
-    GG)
-      dimensions="340x466"
-      ;;
-    MD)
-      dimensions="340x478"
-      ;;
-    NEOGEO)
-      dimensions="340x466"
-      ;;
-    PS)
-      dimensions="340x320"
-      ;;
-    SEGACD)
-      dimensions="340x480"
-      ;;
-    SFC)
-      dimensions="340x249"
-      ;;
-    *)
-      echo "Invalid system argument. Choose from ARCADE, FC, GB, GBA, GBC, GG, MD, NEOGEO, PS, SEGACD, or SFC."
-      exit 1
-      ;;
+  ARCADE)
+    dimensions="340x465"
+    ;;
+  FC)
+    dimensions="340x465"
+    ;;
+  GB)
+    dimensions="340x340"
+    ;;
+  GBA)
+    dimensions="340x340"
+    ;;
+  GBC)
+    dimensions="340x340"
+    ;;
+  GG)
+    dimensions="340x466"
+    ;;
+  MD)
+    dimensions="340x478"
+    ;;
+  NEOGEO)
+    dimensions="340x466"
+    ;;
+  PS)
+    dimensions="340x320"
+    ;;
+  SEGACD)
+    dimensions="340x480"
+    ;;
+  SFC)
+    dimensions="340x249"
+    ;;
+  *)
+    echo "Invalid system argument. Choose from ARCADE, FC, GB, GBA, GBC, GG, MD, NEOGEO, PS, SEGACD, or SFC."
+    exit 1
+    ;;
   esac
 
   # Generate the output filename by appending "resized" to the source image name
