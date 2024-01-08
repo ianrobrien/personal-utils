@@ -1,6 +1,14 @@
 #!/bin/bash
 
+# This script checks for missing PNG files in the "Imgs" subdirectory of each folder in the current directory.
+# It looks for ZIP or CHD files and verifies if corresponding PNG files exist, listing any missing files.
+# Usage: Run this script in the directory containing folders with associated 'Imgs' subdirectories.
+# Output: Displays folders with missing PNG files and their respective filenames.
+# Note: Ensure proper execution permissions are set for this script (chmod +x script_name.sh).
+
 main() {
+  echo "Finding missing images..."
+
   # Set base directory to the current directory
   base_dir="."
 
@@ -26,15 +34,20 @@ main() {
         done
 
         # Output missing files for the current folder in the specified format
-        if [ ${#missing_files[@]} -gt 0 ]; then
+        if [ ${#missing_files[@]} -gt 0 ] && [ "${missing_files[0]}" = "NEOGEO" ]; then
           echo "$folder_name:"
           for file in "${missing_files[@]}"; do
-            echo "  $file"
+            # Exclude "neogeo.zip" from the output
+            if [ "$file" != "neogeo" ]; then
+              echo "  $file"
+            fi
           done
         fi
       fi
     fi
   done
+
+  echo "Finished finding missing images."
 }
 
 main
