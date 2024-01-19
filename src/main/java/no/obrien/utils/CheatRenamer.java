@@ -9,20 +9,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.io.FileUtils;
 
-public class Rg35xxCheatRenamer {
+@UtilityClass
+public class CheatRenamer {
 
-  private static final String OUTPUT_DIRECTORY_CHILD = "output";
+  private static final String OUTPUT_DIRECTORY_CHILD = "cht";
   private static final String CHEAT_FILE_EXTENSION = ".cht";
 
   /***
    * Main method
    */
-  public static void renameFiles(String romsDirectory, String cheatsDirectory) {
+  public void renameCheats(String romsDirectory, String cheatsDirectory) {
     var romsDir = new File(romsDirectory);
     var cheatsDir = new File(cheatsDirectory);
-    var outputDir = new File(cheatsDirectory, OUTPUT_DIRECTORY_CHILD);
+    var outputDir = new File(romsDir, OUTPUT_DIRECTORY_CHILD);
 
     if (!romsDir.isDirectory() || !cheatsDir.isDirectory()) {
       System.err.println("Error: One or both input directories do not exist.");
@@ -66,7 +68,7 @@ public class Rg35xxCheatRenamer {
    *
    * @param outputDirectory output directory
    */
-  private static void createOutputDirectory(File outputDirectory) {
+  private void createOutputDirectory(File outputDirectory) {
     if (outputDirectory.exists() && outputDirectory.isDirectory()) {
       try {
         FileUtils.deleteDirectory(outputDirectory);
@@ -92,7 +94,7 @@ public class Rg35xxCheatRenamer {
    * @param cheatFile exact match cheat file
    * @param outputDirectory output directory
    */
-  private static void handleExactMatch(
+  private void handleExactMatch(
       File romFile,
       File cheatFile,
       File outputDirectory) {
@@ -117,7 +119,7 @@ public class Rg35xxCheatRenamer {
    * @param outputDirectory output directory
    * @param conflictingFiles conflicting files
    */
-  private static void tryFindMatch(
+  private void tryFindMatch(
       String romFileName,
       File[] cheatFiles,
       File outputDirectory,
@@ -158,7 +160,7 @@ public class Rg35xxCheatRenamer {
    * @param conflictingFiles conflicting files
    * @param cheatFile cheat file
    */
-  private static void renameMatch(
+  private void renameMatch(
       String romFileName,
       File outputDirectory,
       List<File> conflictingFiles,
@@ -189,7 +191,7 @@ public class Rg35xxCheatRenamer {
    * @param fileName file name
    * @return file name without extension
    */
-  private static String getFileNameWithoutExtension(String fileName) {
+  private String getFileNameWithoutExtension(String fileName) {
     int lastDotIndex = fileName.lastIndexOf('.');
     return lastDotIndex == -1
         ? fileName
