@@ -34,13 +34,10 @@ main() {
         done
 
         # Output missing files for the current folder in the specified format
-        if [ ${#missing_files[@]} -gt 0 ] && [ "${missing_files[0]}" = "NEOGEO" ]; then
+        if [ ${#missing_files[@]} -gt 0 ]; then
           echo "$folder_name:"
           for file in "${missing_files[@]}"; do
-            # Exclude "neogeo.zip" from the output
-            if [ "$file" != "neogeo" ]; then
-              echo "  $file"
-            fi
+            echo "  $file"
           done
         fi
       fi
